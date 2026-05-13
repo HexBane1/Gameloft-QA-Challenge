@@ -1,0 +1,173 @@
+{
+  "info": {
+    "_postman_id": "0fbe831a-7aa6-4925-86a2-baa53c182e09",
+    "name": "Gameloft_API_Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54690423",
+    "_collection_link": "https://go.postman.co/collection/54690423-0fbe831a-7aa6-4925-86a2-baa53c182e09?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Core_Pages_Status_Response_Time_and_Structure",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Home page and categories status, response time and structure tests\r",
+              "const pagesToCheck = [\r",
+              "    \"/\", //Home page\r",
+              "    \"/search.html?\", //Search page\r",
+              "    \"/hw-index.html?\", //News page\r",
+              "    \"/category.html?catId=18547\", //Action games\r",
+              "    \"/category.html?catId=18563\", //Sports Games\r",
+              "    \"/category.html?catId=18555\", //Family Games\r",
+              "    \"/category.html?catId=18559\", //Casual Games\r",
+              "    \"/category.html?catId=18557\", //Racing Games\r",
+              "    \"/category.html?catId=18551\", //Adventure Games\r",
+              "    \"/category.html?catId=18561\", //Simulation Games\r",
+              "    \"/category.html?catId=18565\", //Strategy Games\r",
+              "    \"/category.html?catId=18549\", //Logic Games\r",
+              "    \"/category.html?catId=18553\", //Boardgames\r",
+              "    \"/category.html?catId=18575\" //All Games\r",
+              "];\r",
+              "\r",
+              "const baseUrl = \"https://play.ludigames.com\";\r",
+              "\r",
+              "\r",
+              "function testPages(index) {\r",
+              "    if (index >= pagesToCheck.length) {\r",
+              "        return; \r",
+              "    }\r",
+              "\r",
+              "    let path = pagesToCheck[index];\r",
+              "\r",
+              "    pm.sendRequest(baseUrl + path, function (err, response) {\r",
+              "        \r",
+              "        \r",
+              "        pm.test(\"Status code is 200 for: \" + path, function () {\r",
+              "            pm.expect(err).to.be.null;\r",
+              "            pm.expect(response.code).to.equal(200);\r",
+              "        });\r",
+              "\r",
+              "        pm.test(\"Response time is under 500 for: \" + path, function () {\r",
+              "            pm.expect(response.responseTime).to.be.below(500);\r",
+              "        });\r",
+              "\r",
+              "        //Check that the page returned isn't blank\r",
+              "        pm.test(\"Response body contains basic HTML structure for: \" + path, function() {\r",
+              "            let responseBody = pm.response.text();\r",
+              "            pm.expect(responseBody).to.include(\"<!doctype html>\");\r",
+              "        });\r",
+              "\r",
+              "        testPages(index + 1);\r",
+              "    });\r",
+              "}\r",
+              "\r",
+              "testPages(0);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://play.ludigames.com",
+          "protocol": "https",
+          "host": [
+            "play",
+            "ludigames",
+            "com"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search_Function_Data_Integrity",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "    // Basic health checks\r",
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response time is under 1000ms\", function () {\r",
+              "    // Request is heavier, response time increased\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+              "});\r",
+              "\r",
+              "    //If we get a response, test if it's a \"category\" object containing multiple games\r",
+              "pm.test(\"Response is a valid object containing keys\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData).to.be.an('object');\r",
+              "\r",
+              "    pm.expect(Object.keys(jsonData).length).to.be.greaterThan(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Games across all categories contain required fields\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    \r",
+              "    // Loop through all keys returned by the request\r",
+              "    Object.keys(jsonData).forEach(function(categoryKey) {\r",
+              "        \r",
+              "        let gamesArray = jsonData[categoryKey];\r",
+              "    \r",
+              "            //Loop through each game in the key array, verifying if the correct syntax is applied for each one     \r",
+              "            gamesArray.forEach(function(game, index) {\r",
+              "                pm.expect(game, `Missing 'name' in category ${categoryKey} at index ${index}`).to.have.property('name');\r",
+              "                pm.expect(game, `Missing 'product_id' in category ${categoryKey} at index ${index}`).to.have.property('product_id');\r",
+              "                pm.expect(game, `Missing 'isPortrait' in category ${categoryKey} at index ${index}`).to.have.property('isPortrait');\r",
+              "                pm.expect(game, `Missing 'product_key' in category ${categoryKey} at index ${index}`).to.have.property('product_key');\r",
+              "                pm.expect(game, `Missing 'assets' in category ${categoryKey} at index ${index}`).to.have.property('assets');\r",
+              "                pm.expect(game.assets, `Missing 'banners' in category ${categoryKey} at index ${index}`).to.have.property('banners');\r",
+              "        });\r",
+              "    });\r",
+              "});\r",
+              "//this is done so in the case that new games are added to the list, the tests will still pass as long as the required fields are present."
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://play.ludigames.com/ludiapi/gamelist.php?cat_id=18575%2C18571%2C18854%2C19023%2C21317&orderByRank=",
+          "protocol": "https",
+          "host": [
+            "play",
+            "ludigames",
+            "com"
+          ],
+          "path": [
+            "ludiapi",
+            "gamelist.php"
+          ],
+          "query": [
+            {
+              "key": "cat_id",
+              "value": "18575%2C18571%2C18854%2C19023%2C21317"
+            },
+            {
+              "key": "orderByRank",
+              "value": ""
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
