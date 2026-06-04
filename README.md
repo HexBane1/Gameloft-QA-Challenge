@@ -69,6 +69,8 @@ Every test should pass, providing the following result:
 
 ## Test decisions/thought process
 
+### API Tests:
+
 **1. Core_Pages_Status_Response_Time_and_Structure**
 
 First, I created a smoke test for all the main pages of the website, with basic tests like: a 200 OK status code check, a response time under 800ms, and an HTML structure check verifying that the returned page isn't blank.
@@ -82,3 +84,23 @@ For the second test, I started by looking at the network requests made through I
 The entire database is split into different keys: one related to the "top 10" list of games that pops up when you search for a game that doesn't exist, a huge "master database" containing the majority of the games on the site, and three other keys that are probably related to the news page or the featured games tab.
 
 After this discovery, I created the basic smoke tests, only increasing the response time threshold to 1000ms due to the heavier load of the request. I also added two other tests: one verifying that the response returns an object containing these specific keys, and another to verify that all games contained inside the keys have the valid required structure (name, product_id, isPortrait, product key, assets, banners).
+
+### UI Tests:
+
+I have opted for Behaviour Driven Development and used Cucumber feature files written in Gherkin to ease the reviewing process, but also because this is how I was taught to handle tests in Software Development in France on my Erasmus+ mobility.
+
+**1. GameLaunch.feature**
+
+```gherkin
+Feature: Game Launch Infrastructure
+  As a player,
+  I want the game rendering engine to boot successfully
+  So that I can play the game without crashes.
+
+  Scenario: Verify the Pixelcraft Parkour HTML5 canvas loads successfully
+    Given the Gameloft browser environment is ready
+    When the user navigates to the game with URL "https://play.ludigames.com/game.html?pID=8070"
+    Then the game rendering canvas should be visible and active
+```
+
+For this first UI test, we try to load the site's most popular game based on the invalid search top 10 list and the .php game list file that I found through inspect element. Also through inspect element I found 2 wrappers
