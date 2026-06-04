@@ -5,6 +5,8 @@ Mix of API and UI tests for the gameloft QA automation coding challenge, using j
 
 ### Prerequisites
 
+Ensure [Git](https://git-scm.com/install/) is installed on your device.
+
 #### API Tests:
 
 **1. Ensure [Node.js](https://nodejs.org/en) is installed on the machine**
@@ -14,13 +16,30 @@ Mix of API and UI tests for the gameloft QA automation coding challenge, using j
 npm install -g newman
 ```
 
+#### UI Tests:
+
+**1. Ensure the [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/downloads/) (version 17 or higher) is installed**
+```bash
+java -version
+```
+
+**2. Ensure Google Chrome is installed on the machine.**
+
+*(Note: You do not need to manually download ChromeDriver. The framework utilizes WebDriverManager to automatically detect your local browser version and download the corresponding driver).*
+
+**3. An IDE with built-in Maven support (Ex: [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=windows), Eclipse) is recommended for execution.**
+
 ## Run Tests
+
+**Firstly, clone the GitHub repository**
+```bash
+git clone https://github.com/HexBane1/Gameloft-QA-Challenge
+```
 
 ### API tests:
 
-**1. Clone the repository and enter the API tests folder**
+**1. Enter the API tests folder**
 ```bash
-git clone https://github.com/HexBane1/Gameloft-QA-Challenge
 cd Gameloft-QA-Challenge/api-tests
 ```
 
@@ -29,8 +48,24 @@ cd Gameloft-QA-Challenge/api-tests
 newman run Gameloft_API_Tests.postman_collection.json
 ```
 
-All tests should fire successfully, providing the following table
+All tests should fire successfully, providing the following table:
 <img width="629" height="364" alt="image" src="https://github.com/user-attachments/assets/86ba036b-2ea7-477b-a51b-2d928d129159" />
+
+### UI Tests:
+
+Because this project uses Maven for dependency management, the easiest way to execute the suite is directly through your IDE:
+
+**1. Open the `Gameloft-QA-Challenge` folder in **IntelliJ IDEA** (or your preferred IDE).**
+
+**2. Allow the IDE to automatically download the Maven dependencies listed in the `pom.xml`.**
+
+**3. Navigate to the `src/test/java/org/example/runners/` directory.**
+
+**4. Right-click the `TestRunner.java` file and select Run 'TestRunner'.**
+
+Every test should pass, providing the following result:
+<img width="695" height="218" alt="image" src="https://github.com/user-attachments/assets/e7a32e3e-fa4f-4e16-832a-4477eb7a1876" />
+
 
 ## Test decisions/thought process
 
