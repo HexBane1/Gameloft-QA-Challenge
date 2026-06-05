@@ -27,7 +27,7 @@ java -version
 
 *(Note: You do not need to manually download ChromeDriver. The framework utilizes WebDriverManager to automatically detect your local browser version and download the corresponding driver).*
 
-**3. An IDE with built-in Maven support (Ex: [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=windows), Eclipse) is recommended for execution.**
+**3. An IDE with built-in Maven support (Ex: [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=windows), Eclipse) is recommended for execution.** 
 
 ## Run Tests
 
@@ -53,15 +53,23 @@ All tests should fire successfully, providing the following table:
 
 ### UI Tests:
 
+**Option A: Via Command Line**
+Open your terminal, navigate to the root `Gameloft_QA_Challenge_UI` folder, and execute the Maven test phase:
+```bash
+mvn clean test
+```
+
+**Option B: Via IDE (IntelliJ, Eclipse)**
+
 Because this project uses Maven for dependency management, the easiest way to execute the suite is directly through your IDE:
 
-**1. Open the `Gameloft-QA-Challenge` folder in **IntelliJ IDEA** (or your preferred IDE).**
+1. Open the `Gameloft_QA_Challenge_UI` folder in **IntelliJ IDEA** (or your preferred IDE).
 
-**2. Allow the IDE to automatically download the Maven dependencies listed in the `pom.xml`.**
+2. Allow the IDE to automatically download the Maven dependencies listed in the `pom.xml`.
 
-**3. Navigate to the `src/test/java/org/example/runners/` directory.**
+3. Navigate to the `src/test/java/org/example/runners/` directory.
 
-**4. Right-click the `TestRunner.java` file and select Run 'TestRunner'.**
+4. Right-click the `TestRunner.java` file and select **Run 'TestRunner'**.
 
 Every test should pass, providing the following result:
 <img width="695" height="218" alt="image" src="https://github.com/user-attachments/assets/e7a32e3e-fa4f-4e16-832a-4477eb7a1876" />
@@ -89,6 +97,11 @@ After this discovery, I created the basic smoke tests, only increasing the respo
 
 I have opted for Behaviour Driven Development and used Cucumber feature files written in Gherkin to ease the reviewing process, but also because this is how I was taught to handle tests in Software Development in France on my Erasmus+ mobility.
 
+#### General UI Architecture
+Before detailing the individual scenarios, there are two global mechanisms implemented across the entire UI suite:
+* **The Page Object Model (POM):** Step definitions (Ex: `GameSteps.java`) are built based on the page classes (Ex:`GamePage.java`), turning the backend Java functions into interpretable `Given/When/Then` steps. This architecture is used for every single UI test.
+* **Universal Cookie Handling:** I built a dynamic function to handle the cookie consent banner that will pop up upon loading all pages of the website for the first time. This is used for every single UI test to ensure the browser view is not obstructed.
+
 **1. GameLaunch.feature**
 
 ```gherkin
@@ -103,4 +116,36 @@ Feature: Game Launch Infrastructure
     Then the game rendering canvas should be visible and active
 ```
 
-For this first UI test, we try to load the site's most popular game based on the invalid search top 10 list and the .php game list file that I found through inspect element. Also through inspect element I found 2 wrappers
+For this first UI test, we try to load the site's most popular game based on the invalid search top 10 list and the .php game list file that I found through inspect element. Also through inspect element, I found 2 nested iframe wrappers for the game frame, we verify if these load and if the game engine canvas dimensions are appropriate (valid width and height > 0).
+
+**2. Monetization.feature**
+
+```gherkin
+  Feature: Monetization Infrastructure
+    As a business stakeholder,
+    I want to ensure the advertisement containers render correctly
+    So that the portal can successfully display monetized content.
+
+  Scenario: Verify the first ad container loads on the homepage
+    Given the Gameloft browser environment is initialized
+    When the user navigates to the LudiGames homepage at "https://play.ludigames.com"
+    Then the primary advertisement should be successfully rendered
+```
+
+This test verifies if the first ad banner is displayed upon launching the home page. Because third-party ad networks can be heavily blocked or delayed by the browser, the script specifically targets the `google_ads_iframe`. The iframe should return a width & height > 0.
+
+**3. Search.feature**
+
+```gherkin
+  Feature: Client-Side Search Functionality
+    As a user,
+    I want to search for specific game genres or titles
+    So that I can quickly find and play relevant games.
+
+  Scenario: Verify the search engine returns clickable game results
+    Given the user navigates to the Gameloft search page "https://play.ludigames.com/search.html"
+    When the user types "puzzle" into the search bar
+    Then the search results should populate with at least one clickable game
+```
+
+To verify if the client-side search functionality is working, we open an instance of the search page, locate the id for the search input box, enter it and try to search for the word "puzzle". The site sends an asynchronous JavaScript request, without reloading the whole site. We then wait to check if the resulted elements are interactable.
