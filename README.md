@@ -23,11 +23,17 @@ npm install -g newman
 java -version
 ```
 
-**2. Ensure Google Chrome is installed on the machine.**
+**2. Ensure [Apache Maven](https://maven.apache.org/download.cgi) is installed and added to your system PATH**
+```bash
+mvn -version
+```
+*(Note: Downloading Apache Maven is required only if you want to test through the terminal, testing through the IDE is recommended)*
+
+**3. Ensure Google Chrome is installed on the machine.**
 
 *(Note: You do not need to manually download ChromeDriver. The framework utilizes WebDriverManager to automatically detect your local browser version and download the corresponding driver).*
 
-**3. An IDE with built-in Maven support (Ex: [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=windows), Eclipse) is recommended for execution.** 
+**4. An IDE with built-in Maven support (Ex: [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=windows), Eclipse) is recommended for execution.** 
 
 ## Run Tests
 
@@ -54,26 +60,35 @@ All tests should fire successfully, providing the following table:
 ### UI Tests:
 
 **Option A: Via Command Line**
-Open your terminal, navigate to the root `Gameloft_QA_Challenge_UI` folder, and execute the Maven test phase:
+Open your terminal, navigate to the root `Gameloft-QA-Challenge` folder, and execute the Maven test phase:
 ```bash
 mvn clean test
 ```
+
+Every test should pass, displaying these results:
+
+<img width="1502" height="341" alt="image" src="https://github.com/user-attachments/assets/38f9ed7f-a6b9-40f7-a03c-89d7622c2ce1" />
 
 **Option B: Via IDE (IntelliJ, Eclipse)**
 
 Because this project uses Maven for dependency management, the easiest way to execute the suite is directly through your IDE:
 
-1. Open the `Gameloft_QA_Challenge_UI` folder in **IntelliJ IDEA** (or your preferred IDE).
-
+1. Open the `Gameloft-QA-Challenge` folder in **IntelliJ IDEA** (or your preferred IDE).
+   
 2. Allow the IDE to automatically download the Maven dependencies listed in the `pom.xml`.
-
+   
 3. Navigate to the `src/test/java/org/example/runners/` directory.
-
+   
 4. Right-click the `TestRunner.java` file and select **Run 'TestRunner'**.
+   
+Again, every test should pass, providing the following result:
 
-Every test should pass, providing the following result:
 <img width="695" height="218" alt="image" src="https://github.com/user-attachments/assets/e7a32e3e-fa4f-4e16-832a-4477eb7a1876" />
 
+### Video demonstration:
+In the unfortunate case that you can't run the tests locally, I've also made a short overview of the UI tests:
+
+[![Gameloft QA Automation Demo](https://img.youtube.com/vi/od2q2_a3Azs/0.jpg)](https://youtu.be/od2q2_a3Azs)
 
 ## Test decisions/thought process
 
